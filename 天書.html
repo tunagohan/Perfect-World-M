@@ -40,21 +40,36 @@
 
 		.display-box {
 			border: solid 1px;
-			border-color: limegreen;
-			/* background-color: cornsilk;
-			color: black; */
+			border-color: forestgreen;
 			height: 20em;
 			overflow: auto;
 			white-space: pre;
 			padding: 0.25em 0.5em;
 		}
+		
+		.title {
+			font-size: xx-large;
+			margin-bottom: 0.5em;
+		}
+		
+		.focus {
+			color: yellow;
+		}
+		.requiring {
+			color: red;
+		}
+		.required {
+			color: aqua;
+		}
 	</style>
 </head>
-<body style="margin:0; color:limegreen; background-color:black;" onload="init()">
+<body style="margin:0; color:forestgreen; background-color:black;" onload="init()">
 	<div id="main-container" style="margin:1em;" class="layout vertical">
-		<!-- dynamic inserted inputs for possessed materials here -->
+		<div class="title">擁有的天書:</div>
+		<div id="possessed-materials-div" class="layout vertical"></div>
 
-		<div class="layout horizontal mtop-1">
+		<div class="mtop-1 title">查詢目標:</div>
+		<div class="layout horizontal">
 			<div class="flex-none" style="width:3em;">Level:</div>
 			<input class="flex-none" type="number" id="level" />
 		</div>
@@ -64,7 +79,7 @@
 			<input type="button" onclick="getMaterialGap(4,2)" value="search" style="margin-left:1em;">
 		</div>
 		<div class="layout horizontal mtop-1">
-			<div class="flex display-box" id="display-box-1"></div>
+			<div class="flex-none display-box" style="width:12em;" id="display-box-1"></div>
 			<div class="flex mleft-2 display-box" id="display-box-2"></div>
 			<div class="flex mleft-2 display-box" id="display-box-3"></div>
 		</div>

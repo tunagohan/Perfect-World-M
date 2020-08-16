@@ -25,6 +25,9 @@ let displayNames = () => {
 	}, []).join('\r\n==================\r\n');
 };
 
+let inputId = (level, no) => ['possess', level, no].join('_');
+let numId = (level, no) => ['num', level, no].join('_');
+
 let nextLevelRequirement = [[
 	[0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0],
@@ -125,7 +128,7 @@ let getMaterialGap = () => {
 	// read possessed material input
 	let possessedMaterials = names.reduce((prev, levelNames, thisLevel) => {
 		prev.push(levelNames.reduce((innerPrev, name, thisNo) => {
-			let thisId = 'possess' + thisLevel + '_' + thisNo;
+			let thisId = inputId(thisLevel, thisNo);
 			let thisNum = parseInt(dID(thisId).value || 0);
 			innerPrev.push(thisNum);
 			return innerPrev;
@@ -183,15 +186,10 @@ let getMaterialGap = () => {
 	}
 
 	outputStr.push('requirement: ');
-	// console.log('requirement: ');
 	outputStr.push(gapQueue.reduce((prev, material) => {
 		prev.push(dName(material[0], material[1]) + 'x' + material[2]);
 		return prev;
 	}, []).join('\r\n'));
-	/* console.log(gapQueue.reduce((prev, material) => {
-		prev.push(dName(material[0], material[1]) + 'x' + material[2]);
-		return prev;
-	}, []).join('\r\n')); */
 
 	dID('display-box-3').innerHTML = outputStr.join('\r\n');
 };
@@ -204,7 +202,6 @@ let init = () => {
 	for (let thisLevel = 0; thisLevel < names.length; ++thisLevel) {
 		let levelMaterialDiv = document.createElement('div');
 		levelMaterialDiv.className = 'flex-none layout horizontal' + ((thisLevel) ? ' mtop-2' : '');
-		// levelMaterialDiv.style.color = 'yellow';
 
 		for (let thisNo = 0; thisNo < names[thisLevel].length; ++thisNo) {
 			let materialOuterDiv = document.createElement('div');
@@ -215,12 +212,67 @@ let init = () => {
 
 			let materialDiv = document.createElement('div');
 			materialDiv.innerHTML = names[thisLevel][thisNo];
-			materialDiv.style.width = '5em';
+			materialDiv.style.width = '7em';
+			materialDiv.className = 'layout horizontal';
+			materialDiv.style.justifyContent = 'space-between';
+			
+			let numDiv = document.createElement('div');
+			numDiv.style.width = '2em';
+			numDiv.id = numId(thisLevel, thisNo);
+			materialDiv.appendChild(numDiv);
 
 			let materialInput = document.createElement('input');
 			materialInput.type = 'number';
-			materialInput.id = 'possess' + thisLevel + '_' + thisNo;
+			materialInput.id = inputId(thisLevel, thisNo);
 			materialInput.style.width = '3em';
+			materialInput.onblur = (e) => {
+				for (let i = 0; i < names.length; ++i)
+					for (let j = 0; j < names[i].length; ++j) {
+						dID(inputId(i, j)).previousSibling.classList.remove('focus');
+						dID(inputId(i, j)).previousSibling.classList.remove('requiring');
+						dID(inputId(i, j)).previousSibling.classList.remove('required');
+						dID(numId(i, j)).innerHTML = '';
+					}
+			};
+			materialInput.onfocus = (e) => {
+				let thisId = e.target.id;
+				let thisIdSplit = thisId.split('_');
+				if (thisIdSplit && thisIdSplit.length == 3) {
+					let focusLevel = parseInt(thisIdSplit[1]);
+					let focusNo = parseInt(thisIdSplit[2]);
+					for (let i = 0; i < names.length; ++i) {
+						for (let j = 0; j < names[i].length; ++j) {
+							if (i > focusLevel) {
+								dID(inputId(i, j)).previousSibling.classList.remove('focus');
+								dID(inputId(i, j)).previousSibling.classList.remove('required');
+								dID(numId(i, j)).innerHTML = '';
+								if (accumulatedRequirement[i][j][focusLevel][focusNo])
+									dID(inputId(i, j)).previousSibling.classList.add('requiring');
+								else
+									dID(inputId(i, j)).previousSibling.classList.remove('requiring');
+							} else if (i == focusLevel) {
+								dID(inputId(i, j)).previousSibling.classList.remove('required');
+								dID(inputId(i, j)).previousSibling.classList.remove('requiring');
+								dID(numId(i, j)).innerHTML = '';
+								if (j == focusNo)
+									dID(inputId(i, j)).previousSibling.classList.add('focus');
+								else
+									dID(inputId(i, j)).previousSibling.classList.remove('focus');
+							} else {
+								dID(inputId(i, j)).previousSibling.classList.remove('requiring');
+								dID(inputId(i, j)).previousSibling.classList.remove('focus');
+								if (accumulatedRequirement[focusLevel][focusNo][i][j]) {
+									dID(inputId(i, j)).previousSibling.classList.add('required');
+									dID(numId(i, j)).innerHTML = '(' + accumulatedRequirement[focusLevel][focusNo][i][j] + ')';
+								} else {
+									dID(inputId(i, j)).previousSibling.classList.remove('required');
+									dID(numId(i, j)).innerHTML = '';
+								}
+							}
+						}
+					}
+				}
+			};
 
 			materialOuterDiv.appendChild(materialDiv);
 			materialOuterDiv.appendChild(materialInput);
@@ -229,9 +281,7 @@ let init = () => {
 
 		allMaterialDiv.appendChild(levelMaterialDiv);
 	}
-
-	console.log(allMaterialDiv);
-	dID('main-container').insertBefore(allMaterialDiv, dID('main-container').firstChild);
+	dID('possessed-materials-div').appendChild(allMaterialDiv);
 
 	displayNames();
 };
