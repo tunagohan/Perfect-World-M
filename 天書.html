@@ -1,0 +1,73 @@
+<html>
+<head>
+	<script src=".\天書.js"></script>
+	<style>
+		.layout {
+			display: flex;
+		}
+
+		.horizontal {
+			flex-direction: row;
+		}
+
+		.vertical {
+			flex-direction: column;
+		}
+
+		.flex {
+			flex: 1 1 0.0000000000001px;
+		}
+
+		.flex-none {
+			flex: none;
+		}
+
+		.mtop-1 {
+			margin-top: 1em;
+		}
+
+		.mtop-2 {
+			margin-top: 0.5em;
+		}
+
+		.mleft-1 {
+			margin-left: 1em;
+		}
+
+		.mleft-2 {
+			margin-left: 0.5em;
+		}
+
+		.display-box {
+			border: solid 1px;
+			border-color: limegreen;
+			/* background-color: cornsilk;
+			color: black; */
+			height: 20em;
+			overflow: auto;
+			white-space: pre;
+			padding: 0.25em 0.5em;
+		}
+	</style>
+</head>
+<body style="margin:0; color:limegreen; background-color:black;" onload="init()">
+	<div id="main-container" style="margin:1em;" class="layout vertical">
+		<!-- dynamic inserted inputs for possessed materials here -->
+
+		<div class="layout horizontal mtop-1">
+			<div class="flex-none" style="width:3em;">Level:</div>
+			<input class="flex-none" type="number" id="level" />
+		</div>
+		<div class="layout horizontal mtop-2">
+			<div class="flex-none" style="width:3em;">No:</div>
+			<input class="flex-none" type="number" id="no" />
+			<input type="button" onclick="getMaterialGap(4,2)" value="search" style="margin-left:1em;">
+		</div>
+		<div class="layout horizontal mtop-1">
+			<div class="flex display-box" id="display-box-1"></div>
+			<div class="flex mleft-2 display-box" id="display-box-2"></div>
+			<div class="flex mleft-2 display-box" id="display-box-3"></div>
+		</div>
+	</div>
+</body>
+</html>
