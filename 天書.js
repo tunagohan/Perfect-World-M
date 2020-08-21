@@ -105,6 +105,19 @@ names.forEach((level, levelIdx) => {
 	});
 });
 
+let possessedMaterials = [];
+let accumulatedPossessedMaterials = [];
+for (let i=0; i<names.length; ++i) {
+	possessedMaterials[i] = [];
+	accumulatedPossessedMaterials[i] = [];
+	for (j=0; j<names[i].length; ++j) {
+		possessedMaterials[i][j] = 0;
+		accumulatedPossessedMaterials[i][j] = 0;
+	}
+}
+
+let showDif = true;
+
 let requiredMaterials = (level, no) => {
 	let requirement = accumulatedRequirement[level-1][no-1].map((matRequirement, matLevel) => {
 		return accumulatedRequirement[level-1][no-1][matLevel].reduce((prev, reqNum, matNo) => {
@@ -115,8 +128,6 @@ let requiredMaterials = (level, no) => {
 	console.log('Required Matrix for ' + names[level-1][no-1]);
 	console.log(requirement);
 }
-
-// requiredMaterials(passedLevel, passedNo);
 
 let getMaterialGap = () => {
 	// read target input
@@ -223,8 +234,29 @@ let init = () => {
 
 			let materialInput = document.createElement('input');
 			materialInput.type = 'number';
+			materialInput.max = '99';
+			materialInput.min = '0';
 			materialInput.id = inputId(thisLevel, thisNo);
 			materialInput.style.width = '3em';
+			
+			materialInput.oninput = (e) => {
+				let thisId = e.target.id;
+				let thisIdSplit = (thisId || '').split('_');
+				if (thisIdSplit && thisIdSplit.length == 3) {
+					let focusLevel = parseInt(thisIdSplit[1]);
+					let focusNo = parseInt(thisIdSplit[2]);
+					let newNumber = parseInt(dID(inputId(focusLevel, focusNo)).value || 0);
+					let dif = newNumber - possessedMaterials[focusLevel][focusNo];
+					console.log(dif + ' to ' + newNumber);
+
+					possessedMaterials[focusLevel][focusNo] = newNumber;
+					accumulatedPossessedMaterials[focusLevel][focusNo] += dif;
+					for (let i=focusLevel-1; i>=0; --i)
+						for (let j=0; j<names[i].length; ++j)
+							accumulatedPossessedMaterials[i][j] += (dif * accumulatedRequirement[focusLevel][focusNo][i][j]);
+				}
+			};
+
 			materialInput.onblur = (e) => {
 				for (let i = 0; i < names.length; ++i)
 					for (let j = 0; j < names[i].length; ++j) {
@@ -236,7 +268,7 @@ let init = () => {
 			};
 			materialInput.onfocus = (e) => {
 				let thisId = e.target.id;
-				let thisIdSplit = thisId.split('_');
+				let thisIdSplit = (thisId || '').split('_');
 				if (thisIdSplit && thisIdSplit.length == 3) {
 					let focusLevel = parseInt(thisIdSplit[1]);
 					let focusNo = parseInt(thisIdSplit[2]);
@@ -262,7 +294,16 @@ let init = () => {
 								dID(inputId(i, j)).previousSibling.classList.remove('requiring');
 								dID(inputId(i, j)).previousSibling.classList.remove('focus');
 								if (accumulatedRequirement[focusLevel][focusNo][i][j]) {
-									dID(inputId(i, j)).previousSibling.classList.add('required');
+									if (showDif) {
+										let gap = accumulatedRequirement[focusLevel][focusNo][i][j] - accumulatedPossessedMaterials[i][j];
+										if (gap > 0) {
+											dID(inputId(i, j)).previousSibling.classList.add('required');
+										} else {
+											dID(inputId(i, j)).previousSibling.classList.remove('required');
+										}
+									} else {
+										dID(inputId(i, j)).previousSibling.classList.add('required');
+									}
 									dID(numId(i, j)).innerHTML = '(' + accumulatedRequirement[focusLevel][focusNo][i][j] + ')';
 								} else {
 									dID(inputId(i, j)).previousSibling.classList.remove('required');
@@ -271,6 +312,48 @@ let init = () => {
 							}
 						}
 					}
+					
+					// show merge path
+					let mergeSteps = [];
+					let requiredHeroBadge = 0;
+					let requiredHonor = 0;
+					let requiredLv1 = [];
+					let dupPossessedMaterials = JSON.parse(JSON.stringify(possessedMaterials));
+					let checkRequirement = (checkLevel, checkNo, num) => {
+						if (dupPossessedMaterials[checkLevel][checkNo] >= num) {
+							// mergeSteps.push('使用 ' + dName(checkLevel, checkNo) + ' x ' + num);
+							dupPossessedMaterials[checkLevel][checkNo] -= num;
+						} else {
+							let nowNum = dupPossessedMaterials[checkLevel][checkNo];
+							let thisGap = num - nowNum;
+							if (nowNum) {
+								// mergeSteps.push('使用 ' + dName(checkLevel, checkNo) + ' x ' + nowNum);
+								dupPossessedMaterials[checkLevel][checkNo] = 0;
+							}
+
+							if (checkLevel > 0) {
+								for (let i=0; i<nextLevelRequirement[checkLevel][checkNo].length; ++i)
+									if (nextLevelRequirement[checkLevel][checkNo][i])
+										checkRequirement(checkLevel-1, i, thisGap * nextLevelRequirement[checkLevel][checkNo][i]);
+								mergeSteps.push('[合成] ' + dName(checkLevel, checkNo) + ' x ' + thisGap + '<br/>');
+							} else {
+								if ([0, 4, 5, 6].includes(checkNo))
+									requiredHeroBadge += (thisGap * 1400);
+								else
+									requiredHonor += (thisGap * 1200);
+								requiredLv1.push([names[0][checkNo], thisGap].join(' x '));
+								mergeSteps.push('>> 兌換 ' + dName(checkLevel, checkNo) + ' x ' + thisGap);
+							}
+						}
+					};
+					checkRequirement(focusLevel, focusNo, 1);
+					dID('display-box-2').innerHTML = mergeSteps.join('<br/>');
+					
+					dID('display-box-3').innerHTML = [
+						'英雄令需求: ' + requiredHeroBadge,
+						'榮譽需求: ' + requiredHonor,
+						requiredLv1.join('<br/>'),
+					].join('<br/>');
 				}
 			};
 
