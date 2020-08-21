@@ -220,6 +220,7 @@ let init = () => {
 			materialOuterDiv.style.borderLeft = 'solid 0.5px';
 			materialOuterDiv.style.borderBottom = 'solid 0.5px';
 			materialOuterDiv.style.padding = '0 0.5em';
+			materialOuterDiv.style.marginLeft = '0.5em';
 
 			let materialDiv = document.createElement('div');
 			materialDiv.innerHTML = names[thisLevel][thisNo];
@@ -317,7 +318,7 @@ let init = () => {
 					let mergeSteps = [];
 					let requiredHeroBadge = 0;
 					let requiredHonor = 0;
-					let requiredLv1 = [];
+					let requiredLv1 = [0, 0, 0, 0, 0, 0, 0, 0];
 					let dupPossessedMaterials = JSON.parse(JSON.stringify(possessedMaterials));
 					let checkRequirement = (checkLevel, checkNo, num) => {
 						if (dupPossessedMaterials[checkLevel][checkNo] >= num) {
@@ -341,7 +342,8 @@ let init = () => {
 									requiredHeroBadge += (thisGap * 1400);
 								else
 									requiredHonor += (thisGap * 1200);
-								requiredLv1.push([names[0][checkNo], thisGap].join(' x '));
+								// requiredLv1.push([names[0][checkNo], thisGap].join(' x '));
+								requiredLv1[checkNo] += thisGap;
 								mergeSteps.push('>> 兌換 ' + dName(checkLevel, checkNo) + ' x ' + thisGap);
 							}
 						}
@@ -352,7 +354,9 @@ let init = () => {
 					dID('display-box-3').innerHTML = [
 						'英雄令需求: ' + requiredHeroBadge,
 						'榮譽需求: ' + requiredHonor,
-						requiredLv1.join('<br/>'),
+						'===================',
+						'共需:',
+						requiredLv1.map((num, idx) => num ? ['\t'+names[0][idx], num].join(' x ') : null).filter((e)=>e).join('<br/>'),
 					].join('<br/>');
 				}
 			};
