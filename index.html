@@ -1,88 +1,95 @@
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>天書計算機</title>
-	<script src=".\天書.js"></script>
-	<style>
-		body {
-			margin: 0;
-			color: forestgreen;
-			background-color: black;
-			width: 100%;
-			height: 100%;
-		}
+  <meta charset="utf-8">
+  <title>天書計算機</title>
+  <script src=".\天書.js"></script>
+  <style>
+    body {
+      margin: 0;
+      color: cadetblue;
+      width: 100%;
+      height: 100%;
+    }
 
-		.layout {
-			display: flex;
-		}
+    .layout {
+      display: flex;
+    }
 
-		.horizontal {
-			flex-direction: row;
-		}
+    .horizontal {
+      flex-direction: row;
+    }
 
-		.vertical {
-			flex-direction: column;
-		}
+    .vertical {
+      flex-direction: column;
+    }
 
-		.flex {
-			flex: 1 1 0.0000000000001px;
-		}
+    .flex {
+      flex: 1 1 0.0000000000001px;
+    }
 
-		.flex-none {
-			flex: none;
-		}
+    .flex-none {
+      flex: none;
+    }
 
-		.mtop-1 {
-			margin-top: 1em;
-		}
+    .mtop-1 {
+      margin-top: 1em;
+    }
 
-		.mtop-2 {
-			margin-top: 0.5em;
-		}
+    .mtop-2 {
+      margin-top: 0.5em;
+    }
 
-		.mleft-1 {
-			margin-left: 1em;
-		}
+    .mleft-1 {
+      margin-left: 1em;
+    }
 
-		.mleft-2 {
-			margin-left: 0.5em;
-		}
+    .mleft-2 {
+      margin-left: 0.5em;
+    }
 
-		.display-box {
-			border: solid 1px;
-			border-color: forestgreen;
-			overflow: auto;
-			white-space: pre;
-			padding: 0.25em 0.5em;
-		}
-		
-		.title {
-			font-size: xx-large;
-			margin-bottom: 0.5em;
-		}
-		
-		.focus {
-			color: yellow;
-		}
-		.requiring {
-			color: red;
-		}
-		.required {
-			color: aqua;
-		}
-	</style>
+    .display-box {
+      border: solid 1px;
+      border-color: forestgreen;
+      overflow: auto;
+      white-space: pre;
+      padding: 0.25em 0.5em;
+    }
+
+    .title {
+      font-size: large;
+      margin-bottom: 0.5em;
+    }
+
+    .focus {
+      color: cornflowerblue;
+    }
+    .requiring {
+      color: darkorange;
+    }
+    .required {
+      color: red;
+    }
+  </style>
 </head>
 <body class="layout vertical" onload="init()">
-	<div id="main-container" style="margin:1em;" class="flex layout vertical">
-		<div class="title">擁有的天書:</div>
-		<div id="possessed-materials-div" class="layout vertical"></div>
+  <div id="main-container" style="margin:1em;" class="flex layout vertical">
+    <div class="">
+      <span>色の説明：</span>
+      <span style="color:cornflowerblue;">現在選択しているもの</span>
+      <span style="color:darkorange;">現在選択している天書が上位で利用できるもの</span>
+      <span style="color:red;">現在選択している天書に必要な天書</span>
+      <br>
+      <span>※狂風暴雨にまだ対応してません</span>
+    </div>
+    <div class="title">天書一覧:</div>
+    <div id="possessed-materials-div" class="layout vertical"></div>
 
-		<div class="mtop-1 title">計算結果:</div>
-		<div class="flex layout horizontal" style="overflow:hidden;">
-			<div class="flex-none display-box" style="width:12em;" id="display-box-1"></div>
-			<div class="flex mleft-2 display-box" id="display-box-2"></div>
-			<div class="flex mleft-2 display-box" id="display-box-3"></div>
-		</div>
-	</div>
+    <div class="mtop-1 title">計算結果:</div>
+    <div class="flex layout horizontal" style="overflow:hidden;">
+      <div class="flex-none display-box" style="width:12em;" id="display-box-1"></div>
+      <div class="flex mleft-2 display-box" id="display-box-2"></div>
+      <div class="flex mleft-2 display-box" id="display-box-3"></div>
+    </div>
+  </div>
 </body>
 </html>
